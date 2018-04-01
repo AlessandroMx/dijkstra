@@ -1,0 +1,15 @@
+#menu-panel {
+    height: 100vh;
+}
+
+#main-panel {
+    background-image: url('../rsc/bg-nodes.jpg');
+    background-repeat: no-repeat;
+    background-attachment: inherit;
+    background-position: center;
+}
+
+#instructions,
+#play {
+    display: none;
+}

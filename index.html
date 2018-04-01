@@ -7,31 +7,57 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Dijkstra</title>
     <link rel="stylesheet" href="css/uikit.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
     <script src="js/uikit.min.js"></script>
     <script src="js/uikit-icons.min.js"></script>
+    <script src="js/menu.js"></script>
 </head>
 
 <body>
     <div class="uk-container-large">
         <div class="uk-grid">
-            <div class="uk-width-1-4">
+            <div class="uk-width-1-4" id="menu-panel">
                 <div class="uk-container">
                     <h1 class="uk-heading-primary uk-text-bold">Visor de Nodos</h1>
                     <ul class="uk-nav uk-nav-default">
                         <li class="uk-nav-header">Menú</li>
                         <li class="uk-nav-divider"></li>
-                        <li>
-                            <a href="#"><span uk-icon="info"></span>&ensp;Instrucciones</a>
+                        <li id="menu-home">
+                            <a href="#">
+                                <span uk-icon="home"></span>&ensp;Home
+                            </a>
                         </li>
-                        <li>
-                            <a href="#"><span uk-icon="play-circle"></span>&ensp;Iniciar</a>
+                        <li id="menu-inst">
+                            <a href="#">
+                                <span uk-icon="info"></span>&ensp;Instrucciones
+                            </a>
+                        </li>
+                        <li id="menu-play">
+                            <a href="#">
+                                <span uk-icon="play-circle"></span>&ensp;Iniciar
+                            </a>
                         </li>
                     </ul>
                 </div>
             </div>
-            <div class="uk-width-3-4">
-                <h1 class="uk-heading-primary">Second Heading</h1>
+            <div class="uk-width-3-4 uk-padding-remove" id="main-panel">
+                <div class="uk-container uk-position-relative uk-height-1-1" id="home">
+                    <div class="uk-overlay uk-light uk-position-bottom-center">
+                        Web App Creada por: Alessandro Chávez
+                    </div>
+                </div>
+                <div class="uk-container-large uk-animation-slide-top uk-background-muted uk-height-1-1" id="instructions">
+                    <div class="uk-container">
+                        <h1 class="uk-heading-bullet">Instrucciones de uso</h1>
+                    </div>
+                </div>
+                <div class="uk-container-large uk-animation-slide-top uk-background-muted uk-height-1-1" id="play">
+                    <div class="uk-container">
+                        <h1 class="uk-heading-bullet">Iniciar</h1>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
