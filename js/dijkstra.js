@@ -5,6 +5,10 @@ window.addEventListener("load", function () {
         $('#canvas').remove();
         $('#canvas-container').append('<canvas id="canvas" width="640" height="420"></canvas>');
 
+        // Enable buttons
+        $('#button-add-node').prop('disabled', false);
+        $('#button-rem-node').prop('disabled', false);
+
         // Start main logic
         main();
 
@@ -45,6 +49,9 @@ let main = function () {
     // Instantiate canvas and context
     let canvas = document.querySelector('#canvas');
     let ctx = canvas.getContext('2d');
+
+    // Canvas width and height
+    canvas.width = $('#canvas').parent().width();
 
     // Canvas properties
     let canvasLeft = getOffsetLeft(canvas);
