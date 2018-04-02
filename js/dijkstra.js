@@ -1,5 +1,14 @@
 window.addEventListener("load", function () {
-    $('#button-play').click(function () { main() });
+    $('#button-play').click(function () {
+        
+        // Remove previous canvas
+        $('#canvas').remove();
+        $('#canvas-container').append('<canvas id="canvas" width="640" height="420"></canvas>');
+
+        // Start main logic
+        main();
+
+    });
 });
 
 
@@ -64,6 +73,7 @@ let main = function () {
 
 }
 
+// Util functions
 function getOffsetLeft(elem) {
     var offsetLeft = 0;
     do {
