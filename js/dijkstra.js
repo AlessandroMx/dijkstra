@@ -57,6 +57,12 @@ let main = function () {
     let nodeCnt = 1;
     let nodeArray = [];
 
+    // Be aware of window resize
+    window.addEventListener('resize', function(e) {
+        canvasLeft = getOffsetLeft(canvas);
+        canvasTop = canvas.offsetTop;
+    });
+
     // Be aware of clicks
     canvas.addEventListener('click', function (e) {
         
