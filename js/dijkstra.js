@@ -21,9 +21,8 @@ class Node {
         this.id = id;
         this.x = x;
         this.y = y;
-        // $('#button-rem-node').prop('disabled', false);
         this.ctx = ctx;
-        this.neighbors = neighbors || null;
+        this.neighbors = neighbors || [];
     }
 
     draw() {
@@ -39,6 +38,15 @@ class Node {
         this.ctx.arc(this.x, this.y - 4, 15, 0, Math.PI * 2, false);
         this.ctx.strokeStyle = '#999999';
         this.ctx.stroke();
+
+        // If neighbors, draw their relation
+        for (let neighbor in this.neighbors) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.x, this.y);
+            this.ctx.lineTo(this.neighbors[neighbor].x, this.neighbors[neighbor].y);
+            this.ctx.strokeStyle = '#999999';
+            this.ctx.stroke();
+        }
 
     }
 
@@ -56,6 +64,12 @@ let main = function () {
     // Disabled buttons
     disableButtons();
 
+    // Set initial modes' values and button
+    setMode('addNodes');
+    setButtonsToSecondary();
+    $('#button-add-node').removeClass('uk-button-secondary');
+    $('#button-add-node').addClass('uk-button-danger');
+
     // Instantiate canvas and context
     let canvas = document.querySelector('#canvas');
     let ctx = canvas.getContext('2d');
@@ -70,11 +84,15 @@ let main = function () {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Set Nodes and Routes...
+    // Set Nodes, Routes and Others...
     let nodeCnt = 0;
+    let nodeLetter = 'A';
     let nodeArray = [];
     let routeCnt = 0;
     let routeArray = [];
+    let numClicks = 1;
+    let node1 = -1;
+    let node2 = -1;
 
     // Be aware of window resize
     window.addEventListener('resize', function (e) {
@@ -92,29 +110,48 @@ let main = function () {
 
             nodeCnt += 1;
 
-            let tmpNode = new Node(nodeCnt, clickX, clickY, ctx);
+            let tmpNode = new Node(nodeLetter, clickX, clickY, ctx);
 
-            // tmpNode.draw();
+            nodeLetter = nodeLetter.substring(0,nodeLetter.length-1) + String.fromCharCode(nodeLetter.charCodeAt(nodeLetter.length-1)+1);
+
             nodeArray.push(tmpNode);
 
         } else if (modes.remNodes) {
-            // PENSARRRR MAAAXSSS
+
             for (let node in nodeArray) {
-                
-                let needToBeRemoved = false;
 
                 let tmpX = nodeArray[node].x;
                 let tmpY = nodeArray[node].y;
 
-                if (clickX <= tmpX + 15 || clickX >= tmpX - 15) {
-                    if (clickY <= tmpY + 15 || clickY >= tmpY - 15) {
-                        needToBeRemoved = true;
+                if (clickX <= tmpX + 15 && clickX >= tmpX - 15) {
+                    if (clickY <= tmpY + 15 && clickY >= tmpY - 15) {
+                        nodeArray.splice(node, 1);
+                        nodeCnt -= 1;
                     }
                 }
 
-                if (needToBeRemoved) {
-                    nodeArray = nodeArray.splice(node, 1);
-                    nodeCnt -= 1;
+            }
+
+        } else if (modes.addRoutes) {
+
+            console.log('modo addRoutes');
+            
+            for (let node in nodeArray) {
+
+                let tmpX = nodeArray[node].x;
+                let tmpY = nodeArray[node].y;
+
+                if (clickX <= tmpX + 15 && clickX >= tmpX - 15) {
+                    if (clickY <= tmpY + 15 && clickY >= tmpY - 15) {
+                        if (numClicks % 2 == 1) {
+                            node1 = node;
+                        } else {
+                            node2 = node;
+                            nodeArray[node1].neighbors.push(nodeArray[node2]);
+                            nodeArray[node2].neighbors.push(nodeArray[node1]);
+                        }
+                        numClicks += 1;
+                    }
                 }
 
             }
@@ -124,7 +161,7 @@ let main = function () {
         // Enable required buttons
         enableRequiredButtons(nodeCnt, routeCnt);
 
-        // Update Canvas
+        // Update Canvas if it has been clicked
         updateCanvas(ctx, nodeArray);
 
     });
@@ -134,8 +171,17 @@ let main = function () {
 
 }
 
+// TODO: Function to check and set the classes to all the buttons
+let setToRequiredStyleButtons = function() {
+    desiredMode = '';
+    for (mode in modes) {
+        if (modes[mode]) desiredMode = mode;
+    }
+}
+
 // Enable all necessary buttons according to the number of nodes and their routes
 let enableRequiredButtons = function (nodeCnt, routeCnt) {
+    disableButtons();
     if (nodeCnt > 0) $('#button-rem-node').prop('disabled', false);
     if (nodeCnt > 1) $('#button-add-route').prop('disabled', false);
     if (routeCnt > 0) $('#button-add-route').prop('disabled', false);
@@ -161,11 +207,11 @@ let setButtonsToSecondary = function () {
 }
 
 // Set the mode of the click according to the option clicked
-let setMode = function(mode) {
+let setMode = function(inpMode) {
     for (let mode in modes) {
         modes[mode] = false;
     }
-    modes[mode] = true;
+    modes[inpMode] = true;
 }
 
 // Update canvas
