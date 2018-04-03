@@ -58,22 +58,22 @@
                     <div class="uk-container">
                         <h1 class="uk-heading-bullet uk-margin-top">Iniciar aplicación</h1>
                         <div class="uk-container">
-                            <button class="uk-button uk-button-default" type="button" uk-toggle="target: #modal-settings" disabled>
-                                <span uk-icon="settings"></span>&ensp;Configurar</button>
                             <button class="uk-button uk-button-primary" id="button-play">
                                 <span uk-icon="play"></span>&ensp;Iniciar</button>
-                            <button class="uk-button uk-button-default" type="button" id="button-add-node" disabled>
-                                <span uk-icon="plus"></span>&ensp;Añadir Nodo
-                            </button>
-                            <button class="uk-button uk-button-default" type="button" id="button-rem-node" disabled>
-                                <span uk-icon="minus"></span>&ensp;Remover Nodo
-                            </button>
-                            <button class="uk-button uk-button-default" type="button" id="button-add-route" disabled>
-                                <span uk-icon="plus"></span>&ensp;Añadir Ruta
-                            </button>
-                            <button class="uk-button uk-button-default" type="button" id="button-rem-route" disabled>
-                                <span uk-icon="minus"></span>&ensp;Remover Ruta
-                            </button>
+                            <div class="uk-button-group" id="container-buttons">
+                                <button class="uk-button uk-button-danger" type="button" id="button-add-node" value="addNodes" disabled>
+                                    <span uk-icon="plus"></span>&ensp;Añadir Nodo
+                                </button>
+                                <button class="uk-button uk-button-secondary" type="button" id="button-rem-node" value="remNodes" disabled>
+                                    <span uk-icon="minus"></span>&ensp;Remover Nodo
+                                </button>
+                                <button class="uk-button uk-button-secondary" type="button" id="button-add-route" value="addRoutes" disabled>
+                                    <span uk-icon="plus"></span>&ensp;Añadir Ruta
+                                </button>
+                                <button class="uk-button uk-button-secondary" type="button" id="button-rem-route" value="remRoutes" disabled>
+                                    <span uk-icon="minus"></span>&ensp;Remover Ruta
+                                </button>
+                            </div>
                         </div>
                         <div class="uk-container uk-margin-top" id="canvas-container">
                             <!-- <canvas id="canvas" width="640" height="420"></canvas> -->
