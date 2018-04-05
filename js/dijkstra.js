@@ -41,11 +41,22 @@ class Node {
 
         // If neighbors, draw their relation
         for (let neighbor in this.neighbors) {
+            // Draw the line between two nodes
             this.ctx.beginPath();
             this.ctx.moveTo(this.x, this.y);
-            this.ctx.lineTo(this.neighbors[neighbor].x, this.neighbors[neighbor].y);
+            this.ctx.lineTo(this.neighbors[neighbor][0].x, this.neighbors[neighbor][0].y);
             this.ctx.strokeStyle = '#999999';
             this.ctx.stroke();
+            // Draw the weight of this route if weight is defined
+            if (this.neighbors[neighbor][1] >= 1) {
+                this.ctx.font = 'Open Sans';
+                this.ctx.fillStyle = "#999999";
+                this.ctx.textAlign = 'center';
+                let tmpPos = bestPosForText(this.x, this.y, this.neighbors[neighbor][0].x, this.neighbors[neighbor][0].y);
+                this.ctx.rotate(tmpPos[2]);
+                this.ctx.fillText(this.neighbors[neighbor][1], tmpPos[0], tmpPos[1]);
+                this.ctx.restore();
+            }
         }
 
     }
@@ -133,8 +144,6 @@ let main = function () {
             }
 
         } else if (modes.addRoutes) {
-
-            console.log('modo addRoutes');
             
             for (let node in nodeArray) {
 
@@ -147,8 +156,12 @@ let main = function () {
                             node1 = node;
                         } else {
                             node2 = node;
-                            nodeArray[node1].neighbors.push(nodeArray[node2]);
-                            nodeArray[node2].neighbors.push(nodeArray[node1]);
+                            UIkit.modal.prompt('Peso de la ruta:', '1').then(function (w) {
+                                nodeArray[node1].neighbors.push([nodeArray[node2], w]);
+                                nodeArray[node2].neighbors.push([nodeArray[node1], w]);
+                                // Update Canvas if weight has been set
+                                updateCanvas(ctx, nodeArray);
+                            });
                         }
                         numClicks += 1;
                     }
@@ -237,4 +250,20 @@ let disableButtons = function () {
     $('#button-rem-node').prop('disabled', true);
     $('#button-add-route').prop('disabled', true);
     $('#button-rem-route').prop('disabled', true);
+}
+
+let getMidPoint = function(x1, y1, x2, y2) {
+    return [((x1 + x2)/2), ((y1 + y2)/2)];
+}
+
+let bestPosForText = function(x1, y1, x2, y2) {
+    tmpRes = getMidPoint(x1, y1, x2, y2);
+    let m = (y2 - y1)/(x2 - x1);
+    let rad = Math.atan(m);
+    tmpRes.push(rad);
+    return tmpRes;
+}
+
+let toRadians = function (angle) {
+    return angle * (Math.PI / 180);
 }
