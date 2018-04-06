@@ -68,7 +68,8 @@ let modes = {
     addNodes: true,
     remNodes: false,
     addRoutes: false,
-    remRoutes: false
+    remRoutes: false,
+    dijkstra: false
 };
 
 let main = function () {
@@ -124,7 +125,7 @@ let main = function () {
 
             let tmpNode = new Node(nodeLetter, clickX, clickY, ctx);
 
-            nodeLetter = nodeLetter.substring(0,nodeLetter.length-1) + String.fromCharCode(nodeLetter.charCodeAt(nodeLetter.length-1)+1);
+            nodeLetter = nodeLetter.substring(0, nodeLetter.length - 1) + String.fromCharCode(nodeLetter.charCodeAt(nodeLetter.length - 1) + 1);
 
             nodeArray.push(tmpNode);
 
@@ -145,7 +146,7 @@ let main = function () {
             }
 
         } else if (modes.addRoutes) {
-            
+
             for (let node in nodeArray) {
 
                 let tmpX = nodeArray[node].x;
@@ -160,8 +161,11 @@ let main = function () {
                             UIkit.modal.prompt('Peso de la ruta:', '1').then(function (w) {
                                 nodeArray[node1].neighbors.push([nodeArray[node2], w]);
                                 nodeArray[node2].neighbors.push([nodeArray[node1], w]);
+                                routeCnt += 1;
                                 // Update Canvas if weight has been set
                                 updateCanvas(ctx, nodeArray);
+                                // Enable required buttons
+                                enableRequiredButtons(nodeCnt, routeCnt);
                                 // Check current state of nodes' routes
                                 verifyNodeRoutes(nodeArray);
                             });
@@ -172,6 +176,26 @@ let main = function () {
 
             }
 
+        } else if (modes.dijkstra) {
+
+            for (let node in nodeArray) {
+
+                let tmpX = nodeArray[node].x;
+                let tmpY = nodeArray[node].y;
+
+                if (clickX <= tmpX + 15 && clickX >= tmpX - 15) {
+                    if (clickY <= tmpY + 15 && clickY >= tmpY - 15) {
+                        if (numClicks % 2 == 1) {
+                            node1 = node;
+                        } else {
+                            node2 = node;
+                            dijkstra(node1, node2, nodeArray);
+                        }
+                        numClicks += 1;
+                    }
+                }
+
+            }
         }
 
         // Enable required buttons
@@ -188,7 +212,7 @@ let main = function () {
 }
 
 // TODO: Function to check and set the classes to all the buttons
-let setToRequiredStyleButtons = function() {
+let setToRequiredStyleButtons = function () {
     desiredMode = '';
     for (mode in modes) {
         if (modes[mode]) desiredMode = mode;
@@ -200,7 +224,10 @@ let enableRequiredButtons = function (nodeCnt, routeCnt) {
     disableButtons();
     if (nodeCnt > 0) $('#button-rem-node').prop('disabled', false);
     if (nodeCnt > 1) $('#button-add-route').prop('disabled', false);
-    if (routeCnt > 0) $('#button-add-route').prop('disabled', false);
+    if (routeCnt > 0) {
+        $('#button-rem-route').prop('disabled', false);
+        $('#button-dijkstra').prop('disabled', false);
+    }
 }
 
 // Check which button has been clicked to set the mode
@@ -223,7 +250,7 @@ let setButtonsToSecondary = function () {
 }
 
 // Set the mode of the click according to the option clicked
-let setMode = function(inpMode) {
+let setMode = function (inpMode) {
     for (let mode in modes) {
         modes[mode] = false;
     }
@@ -231,11 +258,44 @@ let setMode = function(inpMode) {
 }
 
 // Update canvas
-let updateCanvas = function(ctx, nodeArray) {
+let updateCanvas = function (ctx, nodeArray) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let node in nodeArray) {
         nodeArray[node].draw();
     }
+}
+
+// Dijkstra algorithm and related functions
+let dijkstra = function (startingNode, endingNode, nodeArray) {
+    console.log('startingNode: ' + startingNode + ' endingNode: ' + endingNode);
+    let visited = [];
+    let unvisited = nodeArray;
+    let table = createTable(nodeArray, startingNode);
+    console.log(unvisited);
+    console.log(table);
+
+
+}
+
+let createTable = function (nodeArray, startingNode) {
+    let tmpList = [];
+    for (node in nodeArray) {
+        let subTmpList = [nodeArray[node], startingNode[node] == startingNode ? 0 : Infinity, startingNode[node] == startingNode ? null : undefined];
+        tmpList.push(subTmpList);
+    }
+    return tmpList;
+}
+
+let checkForSmallestCost = function (table) {
+    let minCost = Infinity;
+    let minNode = null;
+    for (row in table) {
+        if (row[1] < minCost) {
+            minCost = row[1];
+            minNode = row[0];
+        }
+    }
+    return minNode;
 }
 
 // Util functions
@@ -253,15 +313,16 @@ let disableButtons = function () {
     $('#button-rem-node').prop('disabled', true);
     $('#button-add-route').prop('disabled', true);
     $('#button-rem-route').prop('disabled', true);
+    $('#button-dijkstra').prop('disabled', true);
 }
 
-let getMidPoint = function(x1, y1, x2, y2) {
-    return [((x1 + x2)/2), ((y1 + y2)/2)];
+let getMidPoint = function (x1, y1, x2, y2) {
+    return [((x1 + x2) / 2), ((y1 + y2) / 2)];
 }
 
-let bestPosForText = function(x1, y1, x2, y2) {
+let bestPosForText = function (x1, y1, x2, y2) {
     tmpRes = getMidPoint(x1, y1, x2, y2);
-    let m = (y2 - y1)/(x2 - x1);
+    let m = (y2 - y1) / (x2 - x1);
     let rad = Math.atan(m);
     tmpRes.push(rad);
     return tmpRes;
@@ -271,7 +332,7 @@ let toRadians = function (angle) {
     return angle * (Math.PI / 180);
 }
 
-let verifyNodeRoutes = function (nodeArray) { 
+let verifyNodeRoutes = function (nodeArray) {
     for (node in nodeArray) {
         console.log('---  ---  ---  ---  ---  ---  ---');
         console.log(nodeArray[node].id);
