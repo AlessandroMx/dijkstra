@@ -50,12 +50,13 @@ class Node {
             // Draw the weight of this route if weight is defined
             if (this.neighbors[neighbor][1] >= 1) {
                 this.ctx.font = 'Open Sans';
-                this.ctx.fillStyle = "#999999";
+                this.ctx.fillStyle = "#000000";
                 this.ctx.textAlign = 'center';
                 let tmpPos = bestPosForText(this.x, this.y, this.neighbors[neighbor][0].x, this.neighbors[neighbor][0].y);
-                this.ctx.rotate(tmpPos[2]);
+                // console.log('tmpPos : ' + tmpPos);
+                // this.ctx.rotate(tmpPos[2]);
                 this.ctx.fillText(this.neighbors[neighbor][1], tmpPos[0], tmpPos[1]);
-                this.ctx.restore();
+                // this.ctx.restore();
             }
         }
 
@@ -161,6 +162,8 @@ let main = function () {
                                 nodeArray[node2].neighbors.push([nodeArray[node1], w]);
                                 // Update Canvas if weight has been set
                                 updateCanvas(ctx, nodeArray);
+                                // Check current state of nodes' routes
+                                verifyNodeRoutes(nodeArray);
                             });
                         }
                         numClicks += 1;
@@ -266,4 +269,12 @@ let bestPosForText = function(x1, y1, x2, y2) {
 
 let toRadians = function (angle) {
     return angle * (Math.PI / 180);
+}
+
+let verifyNodeRoutes = function (nodeArray) { 
+    for (node in nodeArray) {
+        console.log('---  ---  ---  ---  ---  ---  ---');
+        console.log(nodeArray[node].id);
+        console.log(nodeArray[node].neighbors);
+    }
 }
