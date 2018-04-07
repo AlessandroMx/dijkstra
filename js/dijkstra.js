@@ -268,19 +268,36 @@ let updateCanvas = function (ctx, nodeArray) {
 // Dijkstra algorithm and related functions
 let dijkstra = function (startingNode, endingNode, nodeArray) {
     console.log('startingNode: ' + startingNode + ' endingNode: ' + endingNode);
-    let visited = [];
-    let unvisited = nodeArray;
+    let visited = []; // nodeArray[startingNode]
+    let unvisited = createUnvisited(nodeArray);
+    // unvisited = updateUnvisited(startingNode, unvisited);
     let table = createTable(nodeArray, startingNode);
+    let currentNode = nodeArray[startingNode];
+    console.log('Visited array: ');
+    console.log(visited);
+    console.log('Unvisited array: ');
     console.log(unvisited);
+    console.log('Table Array: ');
     console.log(table);
+    // while (currentNode != nodeArray[endingNode]) {
+        
+    // }
+    console.log('CheckForSmallestCost: ');
+    checkForSmallestCost(table);
+}
 
-
+let createUnvisited = function(nodeArray) {
+    let tmpList = [];
+    for (let node in nodeArray) {
+        tmpList.push(nodeArray[node]);
+    }
+    return tmpList;
 }
 
 let createTable = function (nodeArray, startingNode) {
     let tmpList = [];
-    for (node in nodeArray) {
-        let subTmpList = [nodeArray[node], startingNode[node] == startingNode ? 0 : Infinity, startingNode[node] == startingNode ? null : undefined];
+    for (let node in nodeArray) {
+        let subTmpList = [nodeArray[node], startingNode[node] == startingNode ? 0 : Infinity, startingNode[node] == startingNode ? null : undefined, startingNode[node] == startingNode ? true : false];
         tmpList.push(subTmpList);
     }
     return tmpList;
@@ -289,13 +306,35 @@ let createTable = function (nodeArray, startingNode) {
 let checkForSmallestCost = function (table) {
     let minCost = Infinity;
     let minNode = null;
-    for (row in table) {
-        if (row[1] < minCost) {
-            minCost = row[1];
-            minNode = row[0];
+    for (let row in table) {
+        if (table[row][1] < minCost) {
+            minCost = table[row][1];
+            minNode = table[row][0];
         }
     }
     return minNode;
+}
+
+let markAsCurrent = function (node, table) {
+    for (let row in table) {
+        if (table[row][0] == node) {
+            table[row][3] = true;
+        }
+    }
+    return table
+}
+
+let updateUnvisited = function (node, unvisited) {
+    unvisited.splice(node, 1);
+    return unvisited;
+}
+
+let updateVisited = function (visited) {
+
+}
+
+let updateTable = function (currentNode, table) {
+
 }
 
 // Util functions
