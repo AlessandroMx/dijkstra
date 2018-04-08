@@ -53,10 +53,7 @@ class Node {
                 this.ctx.fillStyle = "#000000";
                 this.ctx.textAlign = 'center';
                 let tmpPos = bestPosForText(this.x, this.y, this.neighbors[neighbor][0].x, this.neighbors[neighbor][0].y);
-                // console.log('tmpPos : ' + tmpPos);
-                // this.ctx.rotate(tmpPos[2]);
                 this.ctx.fillText(this.neighbors[neighbor][1], tmpPos[0], tmpPos[1]);
-                // this.ctx.restore();
             }
         }
 
@@ -167,7 +164,7 @@ let main = function () {
                                 // Enable required buttons
                                 enableRequiredButtons(nodeCnt, routeCnt);
                                 // Check current state of nodes' routes
-                                verifyNodeRoutes(nodeArray);
+                                // verifyNodeRoutes(nodeArray);
                             });
                         }
                         numClicks += 1;
@@ -189,7 +186,14 @@ let main = function () {
                             node1 = node;
                         } else {
                             node2 = node;
-                            dijkstra(node1, node2, nodeArray);
+                            let route = dijkstra(node1, node2, nodeArray);
+                            let msgRoute = '';
+                            for (let r in route) {
+                                msgRoute += route[r].id + ', ';
+                            }
+                            msgRoute = msgRoute.substring(0, msgRoute.length - 2);
+                            let msg = 'La mejor ruta del nodo ' + nodeArray[node1].id + ' al nodo ' + nodeArray[node2].id + ' es : \n' + msgRoute;
+                            UIkit.modal.alert(msg);
                         }
                         numClicks += 1;
                     }
@@ -267,23 +271,20 @@ let updateCanvas = function (ctx, nodeArray) {
 
 // Dijkstra algorithm and related functions
 let dijkstra = function (startingNode, endingNode, nodeArray) {
-    console.log('startingNode: ' + startingNode + ' endingNode: ' + endingNode);
-    let visited = []; // nodeArray[startingNode]
+    let visited = [];
     let unvisited = createUnvisited(nodeArray);
-    // unvisited = updateUnvisited(startingNode, unvisited);
     let table = createTable(nodeArray, startingNode);
     let currentNode = nodeArray[startingNode];
-    console.log('Visited array: ');
-    console.log(visited);
-    console.log('Unvisited array: ');
-    console.log(unvisited);
-    console.log('Table Array: ');
-    console.log(table);
-    // while (currentNode != nodeArray[endingNode]) {
-        
-    // }
-    console.log('CheckForSmallestCost: ');
-    checkForSmallestCost(table);
+    while(unvisited.length > 0) {
+        let nextNode = checkForSmallestCost(table, visited);
+        visited.push(currentNode);
+        unvisited.splice(currentNode, 1);
+        updateTableCurrent(nextNode, table);
+        currentNode = nextNode;
+    }
+    // Get road from table variable...
+    let road = getRoad(table, startingNode, endingNode, nodeArray);
+    return road.reverse();
 }
 
 let createUnvisited = function(nodeArray) {
@@ -303,16 +304,37 @@ let createTable = function (nodeArray, startingNode) {
     return tmpList;
 }
 
-let checkForSmallestCost = function (table) {
+let checkForSmallestCost = function (table, visited) {
     let minCost = Infinity;
     let minNode = null;
-    for (let row in table) {
-        if (table[row][1] < minCost) {
-            minCost = table[row][1];
-            minNode = table[row][0];
+    let currentRow = getCurrent(table);
+    let neighborsList = currentRow[0].neighbors;
+    for (let n in neighborsList) {
+        let currentCost = parseInt(neighborsList[n][1]) + parseInt(currentRow[1]);
+        let curNode = neighborsList[n][0];
+        if (currentCost < minCost && !visited.includes(curNode)) {
+            minCost = currentCost;
+            minNode = curNode;
         }
+        updateTable(curNode, table, currentCost, currentRow[0]);
     }
     return minNode;
+}
+
+let getRowTable = function(node, table) {
+    for (let row in table) {
+        if (table[row][0] == node) {
+            return table[row];
+        }
+    }
+}
+
+let getCurrent = function (table) {
+    for (let row in table) {
+        if (table[row][3] == true) {
+            return table[row];
+        }
+    }
 }
 
 let markAsCurrent = function (node, table) {
@@ -329,12 +351,35 @@ let updateUnvisited = function (node, unvisited) {
     return unvisited;
 }
 
-let updateVisited = function (visited) {
-
+let updateTable = function (node, table, minCost, prevNode) {
+    for (let row in table) {
+        if (table[row][0] == node) {
+            if (table[row][1] > minCost) {
+                table[row][1] = minCost;
+                table[row][2] = prevNode;
+            }
+        }
+    }
 }
 
-let updateTable = function (currentNode, table) {
+let updateTableCurrent = function (node, table) {
+    for (let row in table) {
+        table[row][3] = false;
+        if (table[row][0] == node) {
+            table[row][3] = true;
+        }
+    }
+}
 
+let getRoad = function (table, startingNode, endingNode, nodeArray) {
+    let route = [];
+    let curRow = getRowTable(nodeArray[endingNode], table);
+    while (curRow[0] != nodeArray[startingNode]) {
+        route.push(curRow[0]);
+        curRow = getRowTable(curRow[2], table);
+    }
+    route.push(curRow[0]);
+    return route;
 }
 
 // Util functions
