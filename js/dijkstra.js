@@ -276,13 +276,15 @@ let dijkstra = function (startingNode, endingNode, nodeArray) {
     let table = createTable(nodeArray, startingNode);
     let currentNode = nodeArray[startingNode];
     while(unvisited.length > 0) {
-        let nextNode = checkForSmallestCost(table, visited);
+        let nextNode = checkForSmallestCost(table, visited); 
+        if (nextNode == null) break;
         visited.push(currentNode);
         unvisited.splice(currentNode, 1);
         updateTableCurrent(nextNode, table);
         currentNode = nextNode;
     }
     // Get road from table variable...
+    console.log(table);
     let road = getRoad(table, startingNode, endingNode, nodeArray);
     return road.reverse();
 }
@@ -308,7 +310,9 @@ let checkForSmallestCost = function (table, visited) {
     let minCost = Infinity;
     let minNode = null;
     let currentRow = getCurrent(table);
+    // if (currentRow == null || undefined) return null;
     let neighborsList = currentRow[0].neighbors;
+    if (neighborsList == undefined) return minNode;
     for (let n in neighborsList) {
         let currentCost = parseInt(neighborsList[n][1]) + parseInt(currentRow[1]);
         let curNode = neighborsList[n][0];
