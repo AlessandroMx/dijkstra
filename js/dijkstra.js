@@ -186,14 +186,15 @@ let main = function () {
                             node1 = node;
                         } else {
                             node2 = node;
-                            let route = dijkstra(node1, node2, nodeArray);
+                            /* let route = dijkstra(node1, node2, nodeArray);
                             let msgRoute = '';
                             for (let r in route) {
                                 msgRoute += route[r].id + ', ';
                             }
                             msgRoute = msgRoute.substring(0, msgRoute.length - 2);
                             let msg = 'La mejor ruta del nodo ' + nodeArray[node1].id + ' al nodo ' + nodeArray[node2].id + ' es : \n' + msgRoute;
-                            UIkit.modal.alert(msg);
+                            UIkit.modal.alert(msg); */
+                            executeDFT(node1, node2, nodeArray);
                         }
                         numClicks += 1;
                     }
@@ -269,6 +270,53 @@ let updateCanvas = function (ctx, nodeArray) {
     }
 }
 
+// Depth First Traversal Algorithm and related functions
+let executeDFT = function (startingNode, endingNode, nodeArray) {
+    let stack = [nodeArray[startingNode]];
+    let visited = [nodeArray[startingNode]];
+    let paths = [];
+    while (stack.length > 0) {
+        let nextNeighbor = getNextNeighbor(stack[stack.length - 1], visited);
+        if (nextNeighbor != null) {
+            visited.push(nextNeighbor);
+            stack.push(nextNeighbor);
+            if (nextNeighbor == nodeArray[endingNode]) {
+                let tmpList = [];
+                for (let ind in stack) {
+                    tmpList.push(stack[ind]);
+                }
+                paths.push(tmpList);
+            }
+        } else {
+            stack.pop();
+        }
+    }
+    console.log('Paths: ');
+    console.log(paths);
+    return paths;
+}
+
+let getNextNeighbor = function (node, visited) {
+    let minLetter = "Z";
+    let curNode = null;
+    for (let n in node.neighbors) {
+        if (!nodeHasBeenVisisted(node.neighbors[n][0], visited)) {
+            if (node.neighbors[n][0].id < minLetter) {
+                minLetter = node.neighbors[n][0].id;
+                curNode = node.neighbors[n][0];
+            }
+        }
+    }
+    return curNode;
+}
+
+let nodeHasBeenVisisted = function(node, visited) {
+    for (let v in visited) {
+        if (visited[v] == node) return true;
+    }
+    return false;
+}
+
 // Dijkstra algorithm and related functions
 let dijkstra = function (startingNode, endingNode, nodeArray) {
     let visited = [];
@@ -276,15 +324,13 @@ let dijkstra = function (startingNode, endingNode, nodeArray) {
     let table = createTable(nodeArray, startingNode);
     let currentNode = nodeArray[startingNode];
     while(unvisited.length > 0) {
-        let nextNode = checkForSmallestCost(table, visited); 
-        if (nextNode == null) break;
+        let nextNode = checkForSmallestCost(table, visited);
         visited.push(currentNode);
         unvisited.splice(currentNode, 1);
         updateTableCurrent(nextNode, table);
         currentNode = nextNode;
     }
     // Get road from table variable...
-    console.log(table);
     let road = getRoad(table, startingNode, endingNode, nodeArray);
     return road.reverse();
 }
@@ -310,9 +356,7 @@ let checkForSmallestCost = function (table, visited) {
     let minCost = Infinity;
     let minNode = null;
     let currentRow = getCurrent(table);
-    // if (currentRow == null || undefined) return null;
     let neighborsList = currentRow[0].neighbors;
-    if (neighborsList == undefined) return minNode;
     for (let n in neighborsList) {
         let currentCost = parseInt(neighborsList[n][1]) + parseInt(currentRow[1]);
         let curNode = neighborsList[n][0];
