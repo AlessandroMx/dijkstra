@@ -277,13 +277,17 @@ let updateCanvas = function (ctx, nodeArray) {
 // Another approach and related functions
 let findAllPaths = function(graph, start, end, path) {
     path = path != undefined ? path.push(start) : [];
+    console.log('Path: ');
+    console.log(path);
     if (start == end) {
         return path;
     }
     if  (!(start in graph)) return []
     let paths = [];
     for (let node in graph[start]) {
-        if (!path.includes(node)) {
+        console.log('Node: ');
+        console.log(node);
+        if (!searchInList(node, path)) {
             let newPaths = findAllPaths(graph, node, end, path);
             for (let newPath of newPaths) {
                 paths.push(newPath);
