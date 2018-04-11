@@ -194,7 +194,11 @@ let main = function () {
                             msgRoute = msgRoute.substring(0, msgRoute.length - 2);
                             let msg = 'La mejor ruta del nodo ' + nodeArray[node1].id + ' al nodo ' + nodeArray[node2].id + ' es : \n' + msgRoute;
                             UIkit.modal.alert(msg); */
-                            executeDFT(node1, node2, nodeArray);
+                            
+                            // executeDFT(node1, node2, nodeArray);
+
+
+
                         }
                         numClicks += 1;
                     }
@@ -269,6 +273,34 @@ let updateCanvas = function (ctx, nodeArray) {
         nodeArray[node].draw();
     }
 }
+
+// Another approach and related functions
+let findAllPaths = function(graph, start, end, path) {
+    path = path != undefined ? path.push(start) : [];
+    if (start == end) {
+        return path;
+    }
+    if  (!(start in graph)) return []
+    let paths = [];
+    for (let node in graph[start]) {
+        if (!path.includes(node)) {
+            let newPaths = findAllPaths(graph, node, end, path);
+            for (let newPath of newPaths) {
+                paths.push(newPath);
+            }
+        }
+    }
+    return paths;
+}
+
+let searchInList = function(search, list) {
+    for (let item of list) {
+        if (item == search) return true;
+    }
+    return false;
+}
+
+paths = findAllPaths(graph, 'A', 'J');
 
 // Depth First Traversal Algorithm and related functions
 let executeDFT = function (startingNode, endingNode, nodeArray) {
