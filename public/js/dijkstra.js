@@ -195,9 +195,7 @@ let main = function () {
                             let msg = 'La mejor ruta del nodo ' + nodeArray[node1].id + ' al nodo ' + nodeArray[node2].id + ' es : \n' + msgRoute;
                             UIkit.modal.alert(msg); */
                             
-                            // executeDFT(node1, node2, nodeArray);
-
-
+                            executeDFT(node1, node2, nodeArray);
 
                         }
                         numClicks += 1;
@@ -274,19 +272,23 @@ let updateCanvas = function (ctx, nodeArray) {
     }
 }
 
+// Another approach...
+let mat = [[0,1,1],[1,0,1],[1,1,0]];
+
 // Another approach and related functions
 let findAllPaths = function(graph, start, end, path) {
-    path = path != undefined ? path.push(start) : [];
-    console.log('Path: ');
-    console.log(path);
+    if (path == undefined) {
+        path = [];
+    } else {
+        path.push(start);
+    }
     if (start == end) {
+        console.log(start);
         return path;
     }
     if  (!(start in graph)) return []
     let paths = [];
     for (let node in graph[start]) {
-        console.log('Node: ');
-        console.log(node);
         if (!searchInList(node, path)) {
             let newPaths = findAllPaths(graph, node, end, path);
             for (let newPath of newPaths) {
@@ -297,6 +299,9 @@ let findAllPaths = function(graph, start, end, path) {
     return paths;
 }
 
+// let graph = { 'a': {'b': 10, 'c': 5}, 'b': {'a': 10, 'c': 6}, 'c': {'a': 5, 'b':6}}
+// let graph2 = { 'a': {'b': 10, 'c': 5}, 'b': {'c': 6} };
+
 let searchInList = function(search, list) {
     for (let item of list) {
         if (item == search) return true;
@@ -304,7 +309,15 @@ let searchInList = function(search, list) {
     return false;
 }
 
-paths = findAllPaths(graph, 'A', 'J');
+let copyList = function(list) {
+    let tmpList = [];
+    for (let item of list) {
+        tmpList.push(item);
+    }
+    return tmpList;
+}
+
+// paths = findAllPaths(graph, 'A', 'J');
 
 // Depth First Traversal Algorithm and related functions
 let executeDFT = function (startingNode, endingNode, nodeArray) {
