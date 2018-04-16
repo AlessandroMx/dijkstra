@@ -99,7 +99,7 @@ let main = function () {
     let nodeLetter = 'A';
     let nodeArray = [];
     let routeCnt = 0;
-    let routeArray = [];
+    let routeObject = {};
     let numClicks = 1;
     let node1 = -1;
     let node2 = -1;
@@ -158,6 +158,18 @@ let main = function () {
                             UIkit.modal.prompt('Peso de la ruta:', '1').then(function (w) {
                                 nodeArray[node1].neighbors.push([nodeArray[node2], w]);
                                 nodeArray[node2].neighbors.push([nodeArray[node1], w]);
+                                if (routeObject[nodeArray[node1].id] == undefined || routeObject[nodeArray[node2].id] == undefined) {
+                                    routeObject[nodeArray[node1].id] = {
+                                        [nodeArray[node2].id]: w
+                                    };
+                                    routeObject[nodeArray[node2].id] = {
+                                        [nodeArray[node1].id]: w
+                                    };
+                                } else {
+                                    routeObject[nodeArray[node1].id][nodeArray[node2].id] = w;
+                                    routeObject[nodeArray[node2].id][nodeArray[node1].id] = w;
+                                }
+                                console.log(routeObject);
                                 routeCnt += 1;
                                 // Update Canvas if weight has been set
                                 updateCanvas(ctx, nodeArray);
@@ -194,9 +206,16 @@ let main = function () {
                             msgRoute = msgRoute.substring(0, msgRoute.length - 2);
                             let msg = 'La mejor ruta del nodo ' + nodeArray[node1].id + ' al nodo ' + nodeArray[node2].id + ' es : \n' + msgRoute;
                             UIkit.modal.alert(msg); */
-                            
-                            executeDFT(node1, node2, nodeArray);
 
+                            // executeDFT(node1, node2, nodeArray);
+                            var json = JSON.stringify(routeObject);
+                            $.post("/dijkstra", {
+                                "data_json": json,
+                                "source": nodeArray[node1].id,
+                                "end": nodeArray[node2].id
+                            }).done(function (string) {
+                                UIkit.modal.alert(string);
+                            });
                         }
                         numClicks += 1;
                     }
@@ -272,11 +291,8 @@ let updateCanvas = function (ctx, nodeArray) {
     }
 }
 
-// Another approach...
-let mat = [[0,1,1],[1,0,1],[1,1,0]];
-
 // Another approach and related functions
-let findAllPaths = function(graph, start, end, path) {
+let findAllPaths = function (graph, start, end, path) {
     if (path == undefined) {
         path = [];
     } else {
@@ -286,7 +302,7 @@ let findAllPaths = function(graph, start, end, path) {
         console.log(start);
         return path;
     }
-    if  (!(start in graph)) return []
+    if (!(start in graph)) return []
     let paths = [];
     for (let node in graph[start]) {
         if (!searchInList(node, path)) {
@@ -302,22 +318,20 @@ let findAllPaths = function(graph, start, end, path) {
 // let graph = { 'a': {'b': 10, 'c': 5}, 'b': {'a': 10, 'c': 6}, 'c': {'a': 5, 'b':6}}
 // let graph2 = { 'a': {'b': 10, 'c': 5}, 'b': {'c': 6} };
 
-let searchInList = function(search, list) {
+let searchInList = function (search, list) {
     for (let item of list) {
         if (item == search) return true;
     }
     return false;
 }
 
-let copyList = function(list) {
+let copyList = function (list) {
     let tmpList = [];
     for (let item of list) {
         tmpList.push(item);
     }
     return tmpList;
 }
-
-// paths = findAllPaths(graph, 'A', 'J');
 
 // Depth First Traversal Algorithm and related functions
 let executeDFT = function (startingNode, endingNode, nodeArray) {
@@ -359,7 +373,7 @@ let getNextNeighbor = function (node, visited) {
     return curNode;
 }
 
-let nodeHasBeenVisisted = function(node, visited) {
+let nodeHasBeenVisisted = function (node, visited) {
     for (let v in visited) {
         if (visited[v] == node) return true;
     }
@@ -372,7 +386,7 @@ let dijkstra = function (startingNode, endingNode, nodeArray) {
     let unvisited = createUnvisited(nodeArray);
     let table = createTable(nodeArray, startingNode);
     let currentNode = nodeArray[startingNode];
-    while(unvisited.length > 0) {
+    while (unvisited.length > 0) {
         let nextNode = checkForSmallestCost(table, visited);
         visited.push(currentNode);
         unvisited.splice(currentNode, 1);
@@ -384,7 +398,7 @@ let dijkstra = function (startingNode, endingNode, nodeArray) {
     return road.reverse();
 }
 
-let createUnvisited = function(nodeArray) {
+let createUnvisited = function (nodeArray) {
     let tmpList = [];
     for (let node in nodeArray) {
         tmpList.push(nodeArray[node]);
@@ -418,7 +432,7 @@ let checkForSmallestCost = function (table, visited) {
     return minNode;
 }
 
-let getRowTable = function(node, table) {
+let getRowTable = function (node, table) {
     for (let row in table) {
         if (table[row][0] == node) {
             return table[row];
