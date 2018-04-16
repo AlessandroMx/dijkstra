@@ -169,7 +169,6 @@ let main = function () {
                                     routeObject[nodeArray[node1].id][nodeArray[node2].id] = w;
                                     routeObject[nodeArray[node2].id][nodeArray[node1].id] = w;
                                 }
-                                console.log(routeObject);
                                 routeCnt += 1;
                                 // Update Canvas if weight has been set
                                 updateCanvas(ctx, nodeArray);
@@ -214,7 +213,37 @@ let main = function () {
                                 "source": nodeArray[node1].id,
                                 "end": nodeArray[node2].id
                             }).done(function (string) {
-                                UIkit.modal.alert(string);
+                                let arr = JSON.parse(string);
+                                let htmlTableHead = '<table class="uk-table uk-table-striped"><thead><tr><th>Caminos</th><th>Costo</th></tr></thead>';
+                                let htmlTableBody = '<tbody>';
+                                let allWeights = [];
+                                for (element of arr) {
+                                    console.log(element);
+                                    console.log(routeObject);
+                                    let tmpHtml = '<tr><td>';
+                                    let tmpElement = element.slice(0);
+                                    let pathWeight = checkPathsWeight(tmpElement, routeObject);
+                                    allWeights.push(pathWeight);
+                                    console.log(pathWeight);
+                                    console.log(element);
+                                    console.log(routeObject);
+                                    for (e of element) {
+                                        tmpHtml += e + ' -> ';
+                                    }
+                                    tmpHtml = tmpHtml.substring(0, tmpHtml.length - 3) + '</td><td>' + pathWeight + '</td></tr>';
+                                    htmlTableBody += tmpHtml;
+                                }
+                                let minW = Infinity;
+                                let indW = 0, tmpInd = 0;
+                                for (e of allWeights) {
+                                    if (e < minW) {
+                                        minW = e;
+                                        indW = tmpInd;
+                                    }
+                                    tmpInd += 1;
+                                }
+                                let lastHtml = '<p style="margin-top: 5px; margin-bottom: 10px; margin-left: 5px;">Ruta con menor costo: ' + minW + '</p>';
+                                UIkit.modal.dialog(htmlTableHead + htmlTableBody + '</table>' + lastHtml);
                             });
                         }
                         numClicks += 1;
@@ -235,6 +264,18 @@ let main = function () {
     // Check if any button has been clicked
     checkClickedButton();
 
+}
+
+
+// Get the weight of all the given paths
+let checkPathsWeight = function (tmpElement, routeObject) {
+    let curWeight = 0;
+    for (te in tmpElement) {
+        if (routeObject[tmpElement[te]][tmpElement[parseInt(te) + 1]] != undefined) {
+            curWeight += parseInt(routeObject[tmpElement[te]][tmpElement[parseInt(te) + 1]]);
+        }
+    }
+    return curWeight;
 }
 
 // TODO: Function to check and set the classes to all the buttons
@@ -314,9 +355,6 @@ let findAllPaths = function (graph, start, end, path) {
     }
     return paths;
 }
-
-// let graph = { 'a': {'b': 10, 'c': 5}, 'b': {'a': 10, 'c': 6}, 'c': {'a': 5, 'b':6}}
-// let graph2 = { 'a': {'b': 10, 'c': 5}, 'b': {'c': 6} };
 
 let searchInList = function (search, list) {
     for (let item of list) {
