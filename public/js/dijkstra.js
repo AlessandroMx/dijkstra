@@ -13,6 +13,10 @@ window.addEventListener("load", function () {
         main();
 
     });
+    /* $('#button-ran-nodes').click(function() {
+        let charArr = getLetters().split('');
+        console.log(charArr);
+    }); */
 });
 
 
@@ -68,8 +72,7 @@ let modes = {
     addRoutes: false,
     remRoutes: false,
     dijkstra: false,
-    ranNodes: false,
-    ranEdges: false
+    ranNodes: false
 };
 
 let main = function () {
@@ -255,6 +258,11 @@ let main = function () {
                 }
 
             }
+
+        } else if (modes.ranNodes) {
+            let charArr = getLetters().split('');
+            console.log(charArr);
+            
         }
 
         // Enable required buttons
@@ -575,4 +583,16 @@ let verifyNodeRoutes = function (nodeArray) {
         console.log(nodeArray[node].id);
         console.log(nodeArray[node].neighbors);
     }
+}
+
+// Generate random nodes functions
+let getLetters = function () {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    var maxIter = Math.floor(Math.random() * possible.length)
+    
+    for (var i = 0; i < maxIter; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text.split("").filter(function(x, n, s) { return s.indexOf(x) == n }).join("");
 }
