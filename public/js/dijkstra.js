@@ -7,7 +7,8 @@ window.addEventListener("load", function () {
 
         // Enable add node button
         $('#button-add-node').prop('disabled', false);
-
+        $('#button-ran-nodes').prop('disabled', false);
+        $('#button-ran-edges').prop('disabled', false);
         // Start main logic
         main();
 
@@ -66,7 +67,9 @@ let modes = {
     remNodes: false,
     addRoutes: false,
     remRoutes: false,
-    dijkstra: false
+    dijkstra: false,
+    ranNodes: false,
+    ranEdges: false
 };
 
 let main = function () {
@@ -169,6 +172,7 @@ let main = function () {
                                     routeObject[nodeArray[node1].id][nodeArray[node2].id] = w;
                                     routeObject[nodeArray[node2].id][nodeArray[node1].id] = w;
                                 }
+                                console.log(routeObject);
                                 routeCnt += 1;
                                 // Update Canvas if weight has been set
                                 updateCanvas(ctx, nodeArray);
@@ -218,15 +222,10 @@ let main = function () {
                                 let htmlTableBody = '<tbody>';
                                 let allWeights = [];
                                 for (element of arr) {
-                                    console.log(element);
-                                    console.log(routeObject);
                                     let tmpHtml = '<tr><td>';
                                     let tmpElement = element.slice(0);
                                     let pathWeight = checkPathsWeight(tmpElement, routeObject);
                                     allWeights.push(pathWeight);
-                                    console.log(pathWeight);
-                                    console.log(element);
-                                    console.log(routeObject);
                                     for (e of element) {
                                         tmpHtml += e + ' -> ';
                                     }
@@ -242,7 +241,12 @@ let main = function () {
                                     }
                                     tmpInd += 1;
                                 }
-                                let lastHtml = '<p style="margin-top: 5px; margin-bottom: 10px; margin-left: 5px;">Ruta con menor costo: ' + minW + '</p>';
+                                let lastHtml = '';
+                                if (minW != Infinity) {
+                                    lastHtml = '<p style="margin-top: 5px; margin-bottom: 10px; margin-left: 5px;">Menor costo: ' + minW + '</p>';
+                                } else {
+                                    lastHtml = '<p style="margin-top: 5px; margin-bottom: 10px; margin-left: 5px;">Menor costo: Ninguno, no hay conexión.</p>';
+                                }
                                 UIkit.modal.dialog(htmlTableHead + htmlTableBody + '</table>' + lastHtml);
                             });
                         }
